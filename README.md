@@ -1,4 +1,3 @@
-# conscientia-lab.github.io
 # 🚀 Conscientia Lab
 
 ## Sobre Nós

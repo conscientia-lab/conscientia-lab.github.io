@@ -7,7 +7,7 @@ Somos uma **fábrica de software** dedicada ao desenvolvimento de soluções tec
 ## 💼 Nossos Serviços
 
 - **Desenvolvimento Web & Mobile** - Aplicações responsivas e performáticas
-- **Sistemas Personalizados** - Soluções sob medida para seu negócio  
+- **Sistemas Personalizados** - Soluções sob medida para seu negócio
 - **API & Integrações** - Conectando sistemas e plataformas
 - **Consultoria em TI** - Orientação estratégica em tecnologia
 - **DevOps & Cloud** - Infraestrutura escalável e segura
@@ -21,7 +21,7 @@ Trabalhamos com um stack moderno e diversificado:
 **Mobile:** React Native, Flutter, Swift, Kotlin  
 **Database:** PostgreSQL, MongoDB, MySQL, Redis, SQLServer  
 **Cloud:** AWS, Azure, Google Cloud Platform  
-**DevOps:** Docker, Kubernetes, CI/CD, Terraform  
+**DevOps:** Docker, Kubernetes, CI/CD, Terraform
 
 ## 🎯 Nossa Abordagem
 
@@ -37,8 +37,8 @@ Tem um projeto em mente? Vamos transformá-lo em realidade!
 
 📧 **Email:** contato@conscientia-lab.com  
 🌐 **Website:** www.conscientia-lab.com  
-💼 **LinkedIn:** /company/conscientia-lab  
+💼 **LinkedIn:** /company/conscientia-lab
 
 ---
 
-*"Transformando ideias em soluções digitais inovadoras"*
+_"Transformando ideias em soluções digitais inovadoras"_

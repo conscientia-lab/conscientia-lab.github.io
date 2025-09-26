@@ -3,7 +3,10 @@ import { Box, CircularProgress } from "@mui/material";
 import CssBaseline from "@mui/material/CssBaseline";
 import { ThemeProvider } from "@mui/material/styles";
 import { Suspense } from "react";
-import Home from "./pages/Home";
+import Home from "./pages/home/Home";
+import About from "./pages/Sobre/Sobre";
+import Services from "./pages/Servicos/Services";
+import Contacts from "./pages/Contato/Contacts";
 import { theme } from "./themes/theme";
 import { MainLayout } from "./components/Layout/MainLayout";
 import "./i18n";
@@ -31,6 +34,9 @@ function App() {
       <Suspense fallback={<LoadingFallback />}>
         <MainLayout>
           <Home />
+          <About />
+          <Services />
+          <Contacts />
         </MainLayout>
       </Suspense>
     </ThemeProvider>

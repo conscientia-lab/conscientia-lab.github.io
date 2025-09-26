@@ -299,7 +299,7 @@ export const MainLayout: React.FC<MainLayoutProps> = ({ children }) => {
   // Menu completo como na BeSolution
   const menuLinks = [
     { id: "home", label: "Home" },
-    { id: "about", label: "Sobre nós" },
+    { id: "about", label: "Quem somos" },
     { id: "services", label: "Serviços" },
     { id: "contact", label: "Contato" },
   ];

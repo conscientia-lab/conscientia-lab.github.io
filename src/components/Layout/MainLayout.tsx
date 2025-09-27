@@ -78,7 +78,7 @@ const NavLink = styled(motion.a)<NavLinkProps>(({ theme, active }) => ({
   position: "relative",
   padding: theme.spacing(0.5, 1),
   "&:hover": {
-    color: "#10b981",
+    color: "#f59e0b",
   },
   "&::before": {
     content: '""',

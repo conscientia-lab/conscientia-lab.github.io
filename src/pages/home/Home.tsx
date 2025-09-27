@@ -1,16 +1,38 @@
 import { Box, Container, Typography, keyframes } from "@mui/material";
+import { useState, useEffect } from "react";
 import logo from "../../assets/logo_white.png";
 
-// Animações
+// Hook para detectar seção ativa
+const useActiveSection = () => {
+  const [activeSection, setActiveSection] = useState("home");
 
+  useEffect(() => {
+    const handleScroll = () => {
+      const sections = ["home", "about", "services", "contact"];
+
+      for (const section of sections) {
+        const element = document.getElementById(section);
+        if (element) {
+          const rect = element.getBoundingClientRect();
+          if (rect.top <= 100 && rect.bottom >= 100) {
+            setActiveSection(section);
+            break;
+          }
+        }
+      }
+    };
+
+    window.addEventListener("scroll", handleScroll);
+    return () => window.removeEventListener("scroll", handleScroll);
+  }, []);
+
+  return activeSection;
+};
+
+// Animações originais
 const glow = keyframes`
   0%, 100% { text-shadow: 0 0 30px rgba(16, 185, 129, 0.3), 0 0 60px rgba(16, 185, 129, 0.1); }
   50% { text-shadow: 0 0 40px rgba(16, 185, 129, 0.5), 0 0 80px rgba(16, 185, 129, 0.2); }
-`;
-
-const shimmer = keyframes`
-  0% { transform: translateX(-100%); }
-  100% { transform: translateX(100%); }
 `;
 
 const pulse = keyframes`
@@ -29,7 +51,170 @@ const slideUp = keyframes`
   }
 `;
 
+// Nova animação para Matrix Rain
+const matrixFall = keyframes`
+  0% {
+    transform: translateY(-100vh);
+  }
+  100% {
+    transform: translateY(100vh);
+  }
+`;
+
+// Animações para decodificação da logo
+const matrixGlitch = keyframes`
+  0% { 
+    transform: translateX(0); 
+    filter: hue-rotate(0deg);
+  }
+  20% { 
+    transform: translateX(-2px); 
+    filter: hue-rotate(90deg);
+  }
+  40% { 
+    transform: translateX(2px); 
+    filter: hue-rotate(180deg);
+  }
+  60% { 
+    transform: translateX(-1px); 
+    filter: hue-rotate(270deg);
+  }
+  80% { 
+    transform: translateX(1px); 
+    filter: hue-rotate(360deg);
+  }
+  100% { 
+    transform: translateX(0); 
+    filter: hue-rotate(0deg);
+  }
+`;
+
+const matrixFlicker = keyframes`
+  0%, 100% { opacity: 1; }
+  50% { opacity: 0.3; }
+`;
+
+interface MatrixChar {
+  id: number;
+  x: number;
+  chars: string[];
+  delay: number;
+  duration: number;
+}
+
 const Home = () => {
+  // Usar o hook para detectar seção ativa
+  const activeSection = useActiveSection();
+
+  const [showMatrixRain, setShowMatrixRain] = useState(false);
+  const [matrixOpacity, setMatrixOpacity] = useState(0);
+  const [showContent, setShowContent] = useState(false);
+  const [logoDecoding, setLogoDecoding] = useState(false);
+  const [logoGlitchIntensity, setLogoGlitchIntensity] = useState(1);
+  const [matrixChars, setMatrixChars] = useState<MatrixChar[]>([]);
+  const [hasAnimationStarted, setHasAnimationStarted] = useState(false);
+
+  // Caracteres para a chuva Matrix
+  const matrixCharacters =
+    "0123456789ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyzﾊﾐﾋｰｳｼﾅﾓﾆｻﾜ";
+
+  // Verificar se deve executar animação baseado na seção ativa
+  useEffect(() => {
+    // Só executa animação se estivermos na home E não tiver começado ainda
+    if (activeSection === "home" && !hasAnimationStarted) {
+      setShowMatrixRain(true);
+      setLogoDecoding(true);
+      setHasAnimationStarted(true);
+    } else if (activeSection !== "home") {
+      // Se não estamos na home, mostrar conteúdo direto
+      setShowContent(true);
+      setShowMatrixRain(false);
+      setLogoDecoding(false);
+    }
+  }, [activeSection, hasAnimationStarted]);
+
+  useEffect(() => {
+    // Só executa a animação se showMatrixRain for true
+    if (!showMatrixRain) {
+      return;
+    }
+    // Gerar caracteres para a chuva
+    const chars: MatrixChar[] = [];
+    const numColumns = Math.floor(window.innerWidth / 20);
+
+    for (let i = 0; i < numColumns; i++) {
+      chars.push({
+        id: i,
+        x: i * 20 + Math.random() * 15,
+        chars: Array.from(
+          { length: 15 },
+          () =>
+            matrixCharacters[
+              Math.floor(Math.random() * matrixCharacters.length)
+            ]
+        ),
+        delay: Math.random() * 2,
+        duration: 5 + Math.random() * 5,
+      });
+    }
+    setMatrixChars(chars);
+
+    // Fade in nos primeiros 0.5 segundos
+    const fadeInTimer = setTimeout(() => {
+      setMatrixOpacity(1);
+    }, 100);
+
+    // Decodificação da logo - diminui intensidade gradualmente
+    let decodingCounter = 0;
+    const decodingInterval = setInterval(() => {
+      decodingCounter += 1;
+
+      // A cada 200ms diminui a intensidade do glitch - agora 10 segundos de decodificação
+      if (decodingCounter < 50) {
+        setLogoGlitchIntensity(1 - decodingCounter / 50);
+      } else {
+        setLogoDecoding(false);
+        clearInterval(decodingInterval);
+      }
+    }, 200);
+
+    // Começar fade out após 10.5 segundos
+    const fadeOutTimer = setTimeout(() => {
+      setMatrixOpacity(0);
+    }, 10500);
+
+    // Mostrar conteúdo após Matrix terminar - 12 segundos
+    const showContentTimer = setTimeout(() => {
+      setShowContent(true);
+    }, 12000);
+
+    // Remove a chuva após 12 segundos
+    const removeTimer = setTimeout(() => {
+      setShowMatrixRain(false);
+    }, 12000);
+
+    return () => {
+      clearTimeout(fadeInTimer);
+      clearTimeout(fadeOutTimer);
+      clearTimeout(showContentTimer);
+      clearTimeout(removeTimer);
+      clearInterval(decodingInterval);
+    };
+  }, [showMatrixRain]);
+
+  /* 
+    LÓGICA COM useActiveSection:
+    1. Usa o hook personalizado para detectar qual seção está ativa
+    2. Só executa animação Matrix quando activeSection === "home"
+    3. Previne múltiplas execuções com hasAnimationStarted
+    4. Se não estiver na home → mostra conteúdo direto
+    
+    RESULTADO:
+    ✅ Refresh na home → Animação roda
+    ❌ Refresh em outras seções → NÃO roda animação
+    ✅ Navegar para home → Animação roda
+  */
+
   return (
     <Box
       id="home"
@@ -39,6 +224,54 @@ const Home = () => {
         position: "relative",
       }}
     >
+      {/* Matrix Rain Overlay */}
+      {showMatrixRain && (
+        <Box
+          sx={{
+            position: "fixed",
+            top: 0,
+            left: 0,
+            width: "100%",
+            height: "100%",
+            zIndex: 1000,
+            pointerEvents: "none",
+            opacity: matrixOpacity,
+            transition: "opacity 1.5s ease-in-out",
+          }}
+        >
+          {matrixChars.map((column) => (
+            <Box
+              key={column.id}
+              sx={{
+                position: "absolute",
+                left: `${column.x}px`,
+                top: 0,
+                display: "flex",
+                flexDirection: "column",
+                animation: `${matrixFall} ${column.duration}s linear ${column.delay}s infinite`,
+                color: "#00ff00",
+                fontSize: "18px",
+                fontFamily: "monospace",
+                fontWeight: "bold",
+                textShadow: "0 0 5px #00ff00",
+              }}
+            >
+              {column.chars.map((char, index) => (
+                <Box
+                  key={index}
+                  sx={{
+                    opacity: 1 - index * 0.08,
+                    lineHeight: "20px",
+                  }}
+                >
+                  {char}
+                </Box>
+              ))}
+            </Box>
+          ))}
+        </Box>
+      )}
+
       <Container maxWidth="lg" sx={{ position: "relative", zIndex: 1 }}>
         {/* Hero Section */}
         <Box
@@ -69,7 +302,6 @@ const Home = () => {
                 height: "100px",
                 background:
                   "linear-gradient(90deg, transparent, rgba(16, 185, 129, 0.15), transparent)",
-                animation: `${shimmer} 3s ease-in-out infinite`,
                 zIndex: -1,
               },
             }}
@@ -78,7 +310,10 @@ const Home = () => {
               sx={{
                 width: { xs: "360px", sm: "430px" },
                 filter: "drop-shadow(0 0 20px rgba(16, 185, 129, 0.3))",
-                animation: `${glow} 3s ease-in-out infinite`,
+                animation: showContent
+                  ? `${glow} 3s ease-in-out infinite`
+                  : "none",
+                position: "relative",
               }}
             >
               <img
@@ -89,111 +324,165 @@ const Home = () => {
                   height: "auto",
                 }}
               />
+
+              {/* Overlay de decodificação Matrix */}
+              {logoDecoding && (
+                <Box
+                  sx={{
+                    position: "absolute",
+                    top: 0,
+                    left: 0,
+                    width: "100%",
+                    height: "100%",
+                    backgroundColor: "#000",
+                    display: "flex",
+                    flexWrap: "wrap",
+                    alignItems: "center",
+                    justifyContent: "center",
+                    opacity: logoGlitchIntensity,
+                    animation:
+                      logoGlitchIntensity > 0.5
+                        ? `${matrixGlitch} 0.1s infinite`
+                        : "none",
+                    fontSize: "12px",
+                    fontFamily: "monospace",
+                    color: "#00ff00",
+                    textShadow: "0 0 10px #00ff00",
+                    overflow: "hidden",
+                    zIndex: 10,
+                  }}
+                >
+                  {Array.from({ length: 200 }, (_, i) => (
+                    <span
+                      key={i}
+                      style={{
+                        margin: "1px",
+                        opacity: Math.random(),
+                        animation: `${matrixFlicker} ${
+                          0.1 + Math.random() * 0.3
+                        }s infinite`,
+                      }}
+                    >
+                      {
+                        matrixCharacters[
+                          Math.floor(Math.random() * matrixCharacters.length)
+                        ]
+                      }
+                    </span>
+                  ))}
+                </Box>
+              )}
             </Box>
           </Box>
 
           {/* Tagline Principal */}
-          <Typography
-            variant="h2"
-            sx={{
-              fontSize: { xs: "1.8rem", md: "2.5rem", lg: "2.8rem" },
-              fontWeight: 600,
-              mb: 4,
-              background:
-                "linear-gradient(135deg, #10b981 0%, #22c55e 30%, #f59e0b 60%, #10b981 100%)",
-              backgroundSize: "300% 100%",
-              backgroundClip: "text",
-              WebkitBackgroundClip: "text",
-              WebkitTextFillColor: "transparent",
-              textShadow: "0 0 40px rgba(16, 185, 129, 0.4)",
-              animation: `${slideUp} 1s ease-out 0.3s both, ${glow} 4s ease-in-out infinite`,
-              letterSpacing: "2px",
-              textTransform: "uppercase",
-            }}
-          >
-            Transformando ideias em{" "}
-            <Box
-              component="span"
+          {showContent && (
+            <Typography
+              variant="h2"
               sx={{
-                color: "#10b981",
-                fontWeight: 700,
-                display: "block",
-                mt: 1,
+                fontSize: { xs: "1.8rem", md: "2.5rem", lg: "2.8rem" },
+                fontWeight: 600,
+                mb: 4,
+                background:
+                  "linear-gradient(135deg, #10b981 0%, #22c55e 30%, #f59e0b 60%, #10b981 100%)",
+                backgroundSize: "300% 100%",
+                backgroundClip: "text",
+                WebkitBackgroundClip: "text",
+                WebkitTextFillColor: "transparent",
+                textShadow: "0 0 40px rgba(16, 185, 129, 0.4)",
+                animation: `${slideUp} 1s ease-out 0.3s both, ${glow} 4s ease-in-out infinite`,
+                letterSpacing: "2px",
+                textTransform: "uppercase",
               }}
             >
-              soluções inteligentes
-            </Box>
-          </Typography>
+              Transformando ideias em{" "}
+              <Box
+                component="span"
+                sx={{
+                  color: "#10b981",
+                  fontWeight: 700,
+                  display: "block",
+                  mt: 1,
+                }}
+              >
+                soluções inteligentes
+              </Box>
+            </Typography>
+          )}
 
           {/* Descrição */}
-          <Typography
-            variant="body1"
-            sx={{
-              fontSize: { xs: "1.1rem", md: "1.4rem" },
-              mb: 6,
-              opacity: 0.95,
-              maxWidth: "700px",
-              mx: "auto",
-              lineHeight: 1.8,
-              fontWeight: 300,
-              animation: `${slideUp} 1s ease-out 0.6s both`,
-              textShadow: "0 2px 8px rgba(0, 0, 0, 0.5)",
-            }}
-          >
-            Somos uma{" "}
-            <Box
-              component="span"
+          {showContent && (
+            <Typography
+              variant="body1"
               sx={{
-                color: "#10b981",
-                fontWeight: 500,
-                textDecoration: "underline",
-                textDecorationColor: "rgba(16, 185, 129, 0.3)",
+                fontSize: { xs: "1.1rem", md: "1.4rem" },
+                mb: 6,
+                opacity: 0.95,
+                maxWidth: "700px",
+                mx: "auto",
+                lineHeight: 1.8,
+                fontWeight: 300,
+                animation: `${slideUp} 1s ease-out 0.6s both`,
+                textShadow: "0 2px 8px rgba(0, 0, 0, 0.5)",
               }}
             >
-              software house
-            </Box>{" "}
-            especializada em desenvolver aplicações modernas e soluções de{" "}
-            <Box
-              component="span"
-              sx={{
-                color: "#f59e0b",
-                fontWeight: 500,
-              }}
-            >
-              inteligência artificial
-            </Box>{" "}
-            que impulsionam o sucesso do seu negócio.
-          </Typography>
+              Somos uma{" "}
+              <Box
+                component="span"
+                sx={{
+                  color: "#10b981",
+                  fontWeight: 500,
+                  textDecoration: "underline",
+                  textDecorationColor: "rgba(16, 185, 129, 0.3)",
+                }}
+              >
+                software house
+              </Box>{" "}
+              especializada em desenvolver aplicações modernas e soluções de{" "}
+              <Box
+                component="span"
+                sx={{
+                  color: "#f59e0b",
+                  fontWeight: 500,
+                }}
+              >
+                inteligência artificial
+              </Box>{" "}
+              que impulsionam o sucesso do seu negócio.
+            </Typography>
+          )}
 
           {/* Elementos decorativos */}
-          <Box
-            sx={{
-              position: "relative",
-              "&::before, &::after": {
-                content: '""',
-                position: "absolute",
-                height: "2px",
-                background:
-                  "linear-gradient(90deg, transparent, #10b981, transparent)",
-                animation: `${pulse} 3s ease-in-out infinite`,
-              },
-              "&::before": {
-                width: "200px",
-                top: "-50px",
-                left: "50%",
-                transform: "translateX(-50%)",
-              },
-              "&::after": {
-                width: "150px",
-                bottom: "-50px",
-                left: "50%",
-                transform: "translateX(-50%)",
-                background:
-                  "linear-gradient(90deg, transparent, #f59e0b, transparent)",
-                animationDelay: "1.5s",
-              },
-            }}
-          />
+          {showContent && (
+            <Box
+              sx={{
+                position: "relative",
+                "&::before, &::after": {
+                  content: '""',
+                  position: "absolute",
+                  height: "2px",
+                  background:
+                    "linear-gradient(90deg, transparent, #10b981, transparent)",
+                  animation: `${pulse} 3s ease-in-out infinite`,
+                },
+                "&::before": {
+                  width: "200px",
+                  top: "-50px",
+                  left: "50%",
+                  transform: "translateX(-50%)",
+                },
+                "&::after": {
+                  width: "150px",
+                  bottom: "-50px",
+                  left: "50%",
+                  transform: "translateX(-50%)",
+                  background:
+                    "linear-gradient(90deg, transparent, #f59e0b, transparent)",
+                  animationDelay: "1.5s",
+                },
+              }}
+            />
+          )}
         </Box>
       </Container>
     </Box>

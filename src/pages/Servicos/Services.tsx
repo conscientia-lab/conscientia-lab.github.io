@@ -12,6 +12,7 @@ import {
   SmartToy as RPAIcon,
   Cloud as CloudIcon,
   Support as SupportIcon,
+  Assignment as AssignmentIcon,
 } from "@mui/icons-material";
 
 // Animações suaves
@@ -66,7 +67,7 @@ const Services = () => {
       color: "#f59e0b",
     },
     {
-      icon: <CloudIcon sx={{ fontSize: 48 }} />,
+      icon: <AssignmentIcon sx={{ fontSize: 48 }} />,
       title: "Consultoria Tecnológica",
       description:
         "Orientamos sua empresa na escolha das melhores tecnologias e estratégias para atingir seus objetivos de negócio.",
